@@ -17,6 +17,18 @@ async function freeRooms(userId: number) {
   return rooms;
 }
 
+async function check(userId:number) {
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
+  if (!enrollment) throw notFoundError();
+
+  const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
+  if (!ticket) throw notFoundError();
+
+  if (ticket.TicketType.isRemote || !ticket.TicketType.includesHotel || ticket.status !== 'PAID') throw forbiddenError();
+  return;
+  
+}
+
 async function getBooking(userId: number) {
 
   const booking = await bookingRepository.getBooking(userId);
@@ -26,14 +38,7 @@ async function getBooking(userId: number) {
 }
 
 async function postBooking(userId: number, roomId: number) {
-  const enrollment = await enrollmentRepository.findById(userId);
-  if (!enrollment) throw notFoundError();
-
-  const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
-  if (!ticket) throw notFoundError();
-
-  if (ticket.status !== 'PAID' || ticket.TicketType.isRemote || !ticket.TicketType.includesHotel)
-    throw forbiddenError();
+  await check(userId);
 
   const room = await hotelRepository.findRoomWithBookings(roomId);
   if (!room) throw notFoundError();

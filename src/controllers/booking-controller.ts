@@ -16,12 +16,12 @@ export async function getBooking(req: AuthenticatedRequest, res: Response, next:
 }
 
 export async function postBooking(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-    const userId = req.userId;
-    const { roomId } = req.body;
+    const { userId } = req;
+    const { roomId } = req.body as { roomId: number }
 
     try {
         
-        const bookings = await bookingsService.postBooking(userId, (roomId));
+        const bookings = await bookingsService.postBooking(userId, roomId);
     
         return res.status(httpStatus.OK).send({ bookingId: bookings });
     } catch (error) {
@@ -30,16 +30,18 @@ export async function postBooking(req: AuthenticatedRequest, res: Response, next
 }
 
 export async function updateBooking(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-    const id = req.userId;
-    const { roomId } = req.body;
-    const { bookingId } = req.params;
+const { userId } = req;
+    const { bookingId } = req.params as { bookingId: string };
+    const { roomId } = req.body as { roomId: number };
+
 
     try {
         if (!roomId) return res.sendStatus(httpStatus.BAD_REQUEST);
 
-        const booking = await bookingsService.updateBooking(id, parseInt(roomId), parseInt(bookingId));
+        const booking = await bookingsService.updateBooking(userId, parseInt(bookingId), roomId);
+        
 
-        return res.status(httpStatus.OK).send({ bookingId: booking });
+        return res.status(httpStatus.OK).send({ bookingId: bookingId });
     } catch (error) {
         next(error);
     }
