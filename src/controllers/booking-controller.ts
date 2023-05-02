@@ -16,13 +16,12 @@ export async function getBooking(req: AuthenticatedRequest, res: Response, next:
 }
 
 export async function postBooking(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-    const id = req.userId;
+    const userId = req.userId;
     const { roomId } = req.body;
 
     try {
-        if (!roomId) return res.sendStatus(httpStatus.BAD_REQUEST);
-
-        const bookings = await bookingsService.postBooking(id, parseInt(roomId));
+        
+        const bookings = await bookingsService.postBooking(userId, (roomId));
     
         return res.status(httpStatus.OK).send({ bookingId: bookings });
     } catch (error) {

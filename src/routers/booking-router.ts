@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateToken, validateBody, validateParams } from '@/middlewares';
+import { authenticateToken } from '@/middlewares';
 import { postBooking, getBooking, updateBooking } from '@/controllers';
 
 
